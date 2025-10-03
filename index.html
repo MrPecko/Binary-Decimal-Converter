@@ -4,150 +4,731 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Binary ↔ Decimal Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Minimal dark-mode styling */
+    :root {
+      --primary-bg: #0a0a0a;
+      --secondary-bg: #1a1a1a;
+      --card-bg: #222222;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --success-color: #10b981;
+      --error-color: #ef4444;
+      --text-primary: #ffffff;
+      --text-secondary: #a1a1aa;
+      --border-color: #374151;
+      --border-radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 1rem;
-      background: #121212;
-      color: #fff;
-      font-family: sans-serif;
+      padding: 2rem 1rem;
+      background: linear-gradient(135deg, var(--primary-bg) 0%, #1a1a2e 50%, var(--primary-bg) 100%);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      gap: 2rem;
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+      animation: float 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1rem;
+      animation: slideDown 0.8s ease-out;
     }
 
     h1 {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       text-align: center;
+      position: relative;
+    }
+
+    .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+      width: 100%;
+      max-width: 1000px;
+      animation: fadeInUp 1s ease-out 0.2s both;
     }
 
     .converter {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .converter::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-color), var(--success-color));
+      border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .converter:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--accent-color);
+    }
+
+    .converter-title {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       gap: 0.5rem;
-      width: 100%;
-      max-width: 500px;
+      margin-bottom: 1.5rem;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .converter-title i {
+      font-size: 1.4rem;
+      color: var(--accent-color);
+    }
+
+    .input-group {
+      margin-bottom: 1.5rem;
     }
 
     label {
-      font-weight: bold;
-      margin-bottom: 0.2rem;
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrapper {
+      position: relative;
     }
 
     input {
       width: 100%;
-      padding: 0.6rem;
-      border: none;
-      border-radius: 4px;
-      background: #222;
-      color: #fff;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background: var(--secondary-bg);
+      color: var(--text-primary);
       font-size: 1rem;
+      font-family: 'Inter', monospace;
+      transition: all 0.3s ease;
+      outline: none;
     }
 
-    button {
-      padding: 0.6rem 1rem;
+    input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      background: var(--card-bg);
+    }
+
+    input::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.7;
+    }
+
+    .convert-btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
       border: none;
-      border-radius: 4px;
-      background: #333;
-      color: #fff;
+      border-radius: var(--border-radius);
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+      color: var(--text-primary);
       cursor: pointer;
       font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 1rem;
     }
 
-    button:hover {
-      background: #444;
+    .convert-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .convert-btn:hover::before {
+      left: 100%;
+    }
+
+    .convert-btn:hover {
+      background: linear-gradient(135deg, var(--accent-hover), var(--accent-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .convert-btn:active {
+      transform: translateY(0);
+    }
+
+    .convert-btn i {
+      margin-right: 0.5rem;
     }
 
     .output {
-      background: #1e1e1e;
-      margin-top: 0.3rem;
+      background: var(--secondary-bg) !important;
+      border-color: var(--success-color) !important;
+      font-family: 'Courier New', monospace !important;
+      font-weight: 500;
+      position: relative;
     }
 
-    @media (max-width: 600px) {
+    .output:focus {
+      border-color: var(--success-color) !important;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .copy-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--accent-color);
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem;
+      color: white;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s ease;
+      font-size: 0.9rem;
+    }
+
+    .input-wrapper:hover .copy-btn {
+      opacity: 1;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .error {
+      border-color: var(--error-color) !important;
+      background: rgba(239, 68, 68, 0.1) !important;
+    }
+
+    .success {
+      border-color: var(--success-color) !important;
+      background: rgba(16, 185, 129, 0.1) !important;
+    }
+
+    .toast {
+      position: fixed;
+      top: 2rem;
+      right: 2rem;
+      background: var(--card-bg);
+      color: var(--text-primary);
+      padding: 1rem 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-lg);
+      border-left: 4px solid var(--success-color);
+      transform: translateX(400px);
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+
+    .footer a {
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer a:hover {
+      color: var(--accent-hover);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    .processing {
+      animation: pulse 1s infinite;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+      
+      .container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .converter {
+        padding: 1.5rem;
+      }
+      
       h1 {
-        font-size: 1.2rem;
+        font-size: 2rem;
+      }
+      
+      .toast {
+        right: 1rem;
+        left: 1rem;
+        transform: translateY(-200px);
+      }
+      
+      .toast.show {
+        transform: translateY(0);
       }
     }
   </style>
 </head>
 <body>
-  <h1>Binary ↔ Decimal Converter</h1>
-
-  <div class="converter">
-    <label for="decimalInput">Decimal Input</label>
-    <input type="text" id="decimalInput" placeholder="Enter decimal" />
-    <button onclick="convertDecimalToBinary()">Convert Decimal → Binary</button>
-    <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result" readonly />
+  <div class="header">
+    <h1><i class="fas fa-exchange-alt"></i> Binary ↔ Decimal Converter</h1>
+    <p class="subtitle">Convert numbers between binary and decimal formats with style</p>
   </div>
 
-  <div class="converter">
-    <label for="binaryInput">Binary Input</label>
-    <input type="text" id="binaryInput" placeholder="Enter binary" />
-    <button onclick="convertBinaryToDecimal()">Convert Binary → Decimal</button>
-    <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result" readonly />
+  <div class="container">
+    <div class="converter">
+      <div class="converter-title">
+        <i class="fas fa-arrow-right"></i>
+        Decimal to Binary
+      </div>
+      
+      <div class="input-group">
+        <label for="decimalInput">Decimal Input</label>
+        <div class="input-wrapper">
+          <input type="text" id="decimalInput" placeholder="Enter decimal number (e.g., 192.168.1.1)" autocomplete="off" />
+        </div>
+      </div>
+      
+      <button class="convert-btn" onclick="convertDecimalToBinary()">
+        <i class="fas fa-sync-alt"></i>
+        Convert to Binary
+      </button>
+      
+      <div class="input-group">
+        <label for="decimalToBinaryOutput">Binary Result</label>
+        <div class="input-wrapper">
+          <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result will appear here" readonly />
+          <button class="copy-btn" onclick="copyToClipboard('decimalToBinaryOutput')" title="Copy to clipboard">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="converter">
+      <div class="converter-title">
+        <i class="fas fa-arrow-left"></i>
+        Binary to Decimal
+      </div>
+      
+      <div class="input-group">
+        <label for="binaryInput">Binary Input</label>
+        <div class="input-wrapper">
+          <input type="text" id="binaryInput" placeholder="Enter binary number (e.g., 11000000.10101000.00000001.00000001)" autocomplete="off" />
+        </div>
+      </div>
+      
+      <button class="convert-btn" onclick="convertBinaryToDecimal()">
+        <i class="fas fa-sync-alt"></i>
+        Convert to Decimal
+      </button>
+      
+      <div class="input-group">
+        <label for="binaryToDecimalOutput">Decimal Result</label>
+        <div class="input-wrapper">
+          <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result will appear here" readonly />
+          <button class="copy-btn" onclick="copyToClipboard('binaryToDecimalOutput')" title="Copy to clipboard">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Made with <i class="fas fa-heart" style="color: #ef4444;"></i> for developers and network engineers</p>
+    <p>Supports IP addresses, single numbers, and dot-separated segments</p>
+  </div>
+
+  <div id="toast" class="toast">
+    <i class="fas fa-check"></i>
+    <span id="toastMessage">Copied to clipboard!</span>
   </div>
 
   <script>
+    // Add input event listeners for real-time conversion
+    document.addEventListener('DOMContentLoaded', function() {
+      const decimalInput = document.getElementById('decimalInput');
+      const binaryInput = document.getElementById('binaryInput');
+      
+      // Real-time conversion as user types
+      decimalInput.addEventListener('input', debounce(convertDecimalToBinary, 300));
+      binaryInput.addEventListener('input', debounce(convertBinaryToDecimal, 300));
+      
+      // Clear outputs when inputs are cleared
+      decimalInput.addEventListener('input', function() {
+        if (!this.value.trim()) {
+          document.getElementById('decimalToBinaryOutput').value = '';
+          clearValidationClasses('decimalToBinaryOutput');
+        }
+      });
+      
+      binaryInput.addEventListener('input', function() {
+        if (!this.value.trim()) {
+          document.getElementById('binaryToDecimalOutput').value = '';
+          clearValidationClasses('binaryToDecimalOutput');
+        }
+      });
+
+      // Add keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'Enter') {
+          if (document.activeElement === decimalInput) {
+            convertDecimalToBinary();
+          } else if (document.activeElement === binaryInput) {
+            convertBinaryToDecimal();
+          }
+        }
+      });
+    });
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
     function convertDecimalToBinary() {
       const decimalInput = document.getElementById('decimalInput').value.trim();
       const outputField = document.getElementById('decimalToBinaryOutput');
+      const button = document.querySelector('[onclick="convertDecimalToBinary()"]');
 
       if (!decimalInput) {
         outputField.value = '';
+        clearValidationClasses('decimalToBinaryOutput');
         return;
       }
 
-      // Split by '.' to handle multiple segments (like IP address segments)
-      const segments = decimalInput.split('.');
-      try {
-        const binarySegments = segments.map(seg => {
-          const num = parseInt(seg, 10);
-          if (isNaN(num) || num < 0 || num > 255) {
-            throw new Error('Invalid decimal segment');
+      // Add processing animation
+      button.classList.add('processing');
+
+      setTimeout(() => {
+        try {
+          // Handle different input types
+          let result;
+          
+          if (decimalInput.includes('.')) {
+            // Handle IP address or dot-separated segments
+            const segments = decimalInput.split('.');
+            const binarySegments = segments.map(seg => {
+              const num = parseInt(seg, 10);
+              if (isNaN(num) || num < 0) {
+                throw new Error('Invalid decimal segment: must be non-negative');
+              }
+              if (num > 255 && segments.length > 1) {
+                throw new Error('IP address segments must be 0-255');
+              }
+              if (num > 4294967295) {
+                throw new Error('Number too large');
+              }
+              // Convert to binary and pad appropriately
+              const bits = segments.length > 1 ? 8 : Math.max(8, Math.ceil(Math.log2(num + 1)));
+              return num.toString(2).padStart(bits, '0');
+            });
+            result = binarySegments.join('.');
+          } else {
+            // Handle single decimal number
+            const num = parseInt(decimalInput, 10);
+            if (isNaN(num) || num < 0) {
+              throw new Error('Invalid decimal number');
+            }
+            if (num > 4294967295) {
+              throw new Error('Number too large (max: 4,294,967,295)');
+            }
+            result = num.toString(2);
           }
-          // Convert to binary and left-pad to 8 bits
-          return num.toString(2).padStart(8, '0');
-        });
-        // Rejoin with '.'
-        outputField.value = binarySegments.join('.');
-      } catch (err) {
-        outputField.value = 'Invalid input';
-      }
+
+          outputField.value = result;
+          setValidationState('decimalToBinaryOutput', 'success');
+          
+          // Add completion animation
+          outputField.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            outputField.style.transform = 'scale(1)';
+          }, 200);
+          
+        } catch (err) {
+          outputField.value = `Error: ${err.message}`;
+          setValidationState('decimalToBinaryOutput', 'error');
+        }
+        
+        button.classList.remove('processing');
+      }, 100);
     }
 
     function convertBinaryToDecimal() {
       const binaryInput = document.getElementById('binaryInput').value.trim();
       const outputField = document.getElementById('binaryToDecimalOutput');
+      const button = document.querySelector('[onclick="convertBinaryToDecimal()"]');
 
       if (!binaryInput) {
         outputField.value = '';
+        clearValidationClasses('binaryToDecimalOutput');
         return;
       }
 
-      // Split by '.' for multiple segments
-      const segments = binaryInput.split('.');
-      try {
-        const decimalSegments = segments.map(seg => {
-          // parse binary (up to 8 bits if IP style)
-          if (seg.length > 8) {
-            throw new Error('Binary segment longer than 8 bits');
+      // Add processing animation
+      button.classList.add('processing');
+
+      setTimeout(() => {
+        try {
+          // Validate binary input (only 0s and 1s, and dots)
+          if (!/^[01.]+$/.test(binaryInput)) {
+            throw new Error('Invalid binary format: use only 0, 1, and dots');
           }
-          const num = parseInt(seg, 2);
-          if (isNaN(num) || num < 0 || num > 255) {
-            throw new Error('Invalid binary segment');
+
+          let result;
+          
+          if (binaryInput.includes('.')) {
+            // Handle dot-separated binary segments
+            const segments = binaryInput.split('.');
+            const decimalSegments = segments.map((seg, index) => {
+              if (!seg) {
+                throw new Error('Empty binary segment');
+              }
+              if (seg.length > 32) {
+                throw new Error('Binary segment too long (max 32 bits)');
+              }
+              
+              const num = parseInt(seg, 2);
+              if (isNaN(num)) {
+                throw new Error(`Invalid binary segment: ${seg}`);
+              }
+              
+              // For IP addresses, warn if segment > 255
+              if (segments.length === 4 && num > 255) {
+                console.warn(`Segment ${index + 1} (${num}) exceeds typical IP range (0-255)`);
+              }
+              
+              return num.toString();
+            });
+            result = decimalSegments.join('.');
+          } else {
+            // Handle single binary number
+            if (binaryInput.length > 32) {
+              throw new Error('Binary number too long (max 32 bits)');
+            }
+            const num = parseInt(binaryInput, 2);
+            if (isNaN(num)) {
+              throw new Error('Invalid binary number');
+            }
+            result = num.toString();
           }
-          return num.toString();
-        });
-        outputField.value = decimalSegments.join('.');
-      } catch (err) {
-        outputField.value = 'Invalid input';
-      }
+
+          outputField.value = result;
+          setValidationState('binaryToDecimalOutput', 'success');
+          
+          // Add completion animation
+          outputField.style.transform = 'scale(1.02)';
+          setTimeout(() => {
+            outputField.style.transform = 'scale(1)';
+          }, 200);
+          
+        } catch (err) {
+          outputField.value = `Error: ${err.message}`;
+          setValidationState('binaryToDecimalOutput', 'error');
+        }
+        
+        button.classList.remove('processing');
+      }, 100);
     }
+
+    function setValidationState(fieldId, state) {
+      const field = document.getElementById(fieldId);
+      clearValidationClasses(fieldId);
+      field.classList.add(state);
+    }
+
+    function clearValidationClasses(fieldId) {
+      const field = document.getElementById(fieldId);
+      field.classList.remove('error', 'success');
+    }
+
+    function copyToClipboard(fieldId) {
+      const field = document.getElementById(fieldId);
+      const text = field.value;
+      
+      if (!text || text.startsWith('Error:')) {
+        showToast('Nothing to copy!', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard!', 'success');
+        
+        // Visual feedback on the button
+        const copyBtn = field.parentNode.querySelector('.copy-btn');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+        copyBtn.style.background = '#10b981';
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.style.background = '';
+        }, 1000);
+        
+      }).catch(() => {
+        // Fallback for older browsers
+        field.select();
+        field.setSelectionRange(0, 99999);
+        document.execCommand('copy');
+        showToast('Copied to clipboard!', 'success');
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+      
+      toastMessage.textContent = message;
+      toast.className = 'toast';
+      
+      if (type === 'error') {
+        toast.style.borderLeftColor = '#ef4444';
+      } else {
+        toast.style.borderLeftColor = '#10b981';
+      }
+      
+      // Show toast
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 100);
+      
+      // Hide toast after 3 seconds
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Add some fun Easter eggs
+    let konamiCode = [];
+    const konamiSequence = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // ↑↑↓↓←→←→BA
+
+    document.addEventListener('keydown', function(e) {
+      konamiCode.push(e.keyCode);
+      if (konamiCode.length > konamiSequence.length) {
+        konamiCode.shift();
+      }
+      
+      if (JSON.stringify(konamiCode) === JSON.stringify(konamiSequence)) {
+        showToast('🎉 Konami Code activated! You found the Easter egg!', 'success');
+        document.body.style.animation = 'pulse 0.5s ease-in-out 3';
+        konamiCode = [];
+      }
+    });
   </script>
 </body>
 </html>
