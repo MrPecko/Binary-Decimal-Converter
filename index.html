@@ -68,6 +68,18 @@
       margin-top: 0.3rem;
     }
 
+    .output-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.3rem;
+    }
+
+    .output-wrapper .output {
+      margin-top: 0;
+      flex-grow: 1;
+    }
+
     @media (max-width: 600px) {
       h1 {
         font-size: 1.2rem;
@@ -82,14 +94,20 @@
     <label for="decimalInput">Decimal Input</label>
     <input type="text" id="decimalInput" placeholder="Enter decimal" />
     <button onclick="convertDecimalToBinary()">Convert Decimal → Binary</button>
-    <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result" readonly />
+    <div class="output-wrapper">
+      <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result" readonly />
+      <button onclick="copyToClipboard('decimalToBinaryOutput', this)">Copy</button>
+    </div>
   </div>
 
   <div class="converter">
     <label for="binaryInput">Binary Input</label>
     <input type="text" id="binaryInput" placeholder="Enter binary" />
     <button onclick="convertBinaryToDecimal()">Convert Binary → Decimal</button>
-    <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result" readonly />
+    <div class="output-wrapper">
+      <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result" readonly />
+      <button onclick="copyToClipboard('binaryToDecimalOutput', this)">Copy</button>
+    </div>
   </div>
 
   <script>
@@ -146,6 +164,22 @@
         outputField.value = decimalSegments.join('.');
       } catch (err) {
         outputField.value = 'Invalid input';
+      }
+    }
+//added copy functionality button
+    function copyToClipboard(elementId, buttonElement) {
+      const outputField = document.getElementById(elementId);
+      const textToCopy = outputField.value;
+
+      if (textToCopy) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          // Provide user feedback
+          const originalText = buttonElement.textContent;
+          buttonElement.textContent = 'Copied!';
+          setTimeout(() => {
+            buttonElement.textContent = originalText;
+          }, 1500);
+        });
       }
     }
   </script>
