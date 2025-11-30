@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Binary ↔ Decimal Converter</title>
   <style>
-    /* Minimal dark-mode styling */
+   /* Minimal dark-mode styling */
     body {
       margin: 0;
       padding: 1rem;
@@ -14,24 +14,64 @@
       font-family: sans-serif;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
     }
 
     h1 {
-      margin: 0;
-      font-size: 1.5rem;
+      margin: 1rem 0;
+      font-size: 1.6rem;
       text-align: center;
+      cursor: pointer;
+      transition: transform 0.6s, color 0.4s, text-shadow 0.4s;
+    }
+
+    
+    h1:hover {
+      color:#222; 
+      text-shadow: 0 0 10px #fff, 0 0 20px #222;
+    }
+
+    .scene {
+      width: 100%;
+      max-width: 500px;
+      height: 260px;
+      perspective: 1000px;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease-in-out;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
     }
 
     .converter {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      background: #1e1e1e;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-      width: 100%;
-      max-width: 500px;
+      gap: 0.6rem;
+      justify-content: center;
+      align-items: stretch;
+      transform: rotateY(0deg);
+    }
+
+   
+    .back {
+      transform: rotateY(180deg);
     }
 
     label {
@@ -57,10 +97,12 @@
       color: #fff;
       cursor: pointer;
       font-size: 1rem;
+      transition: background 0.3s, box-shadow 0.3s;
     }
 
     button:hover {
-      background: #444;
+      background: #121212;
+      box-shadow: 0 0 10px #121214;
     }
 
     .output {
@@ -76,23 +118,42 @@
   </style>
 </head>
 <body>
-  <h1>Binary ↔ Decimal Converter</h1>
+  <h1 id="flipTitle">Binary → Decimal Converter</h1>
 
-  <div class="converter">
-    <label for="decimalInput">Decimal Input</label>
-    <input type="text" id="decimalInput" placeholder="Enter decimal" />
-    <button onclick="convertDecimalToBinary()">Convert Decimal → Binary</button>
-    <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result" readonly />
-  </div>
+  <div class="scene">
+    <div class="card" id="converterCard">
+     
+      <div class="converter front">
+        <label for="binaryInput">Binary Input</label>
+        <input type="text" id="binaryInput" placeholder="Enter binary" />
+        <button onclick="convertBinaryToDecimal()">Convert Binary → Decimal</button>
+        <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result" readonly />
+      </div>
 
-  <div class="converter">
-    <label for="binaryInput">Binary Input</label>
-    <input type="text" id="binaryInput" placeholder="Enter binary" />
-    <button onclick="convertBinaryToDecimal()">Convert Binary → Decimal</button>
-    <input type="text" id="binaryToDecimalOutput" class="output" placeholder="Decimal result" readonly />
+     
+      <div class="converter back">
+        <label for="decimalInput">Decimal Input</label>
+        <input type="text" id="decimalInput" placeholder="Enter decimal" />
+        <button onclick="convertDecimalToBinary()">Convert Decimal → Binary</button>
+        <input type="text" id="decimalToBinaryOutput" class="output" placeholder="Binary result" readonly />
+      </div>
+    </div>
   </div>
 
   <script>
+    const title = document.getElementById("flipTitle");
+    const card = document.getElementById("converterCard");
+    let flipped = false;
+
+    title.addEventListener("click", () => {
+      flipped = !flipped;
+      card.classList.toggle("flipped", flipped);
+      title.textContent = flipped
+        ? "Decimal → Binary Converter"
+        : "Binary → Decimal Converter";
+    });
+
+    
     function convertDecimalToBinary() {
       const decimalInput = document.getElementById('decimalInput').value.trim();
       const outputField = document.getElementById('decimalToBinaryOutput');
@@ -113,9 +174,9 @@
           // Convert to binary and left-pad to 8 bits
           return num.toString(2).padStart(8, '0');
         });
-        // Rejoin with '.'
+         // Rejoin with '.'
         outputField.value = binarySegments.join('.');
-      } catch (err) {
+      } catch {
         outputField.value = 'Invalid input';
       }
     }
@@ -128,23 +189,18 @@
         outputField.value = '';
         return;
       }
-
       // Split by '.' for multiple segments
       const segments = binaryInput.split('.');
       try {
         const decimalSegments = segments.map(seg => {
           // parse binary (up to 8 bits if IP style)
-          if (seg.length > 8) {
-            throw new Error('Binary segment longer than 8 bits');
-          }
+          if (seg.length > 8) throw new Error('Binary segment too long');
           const num = parseInt(seg, 2);
-          if (isNaN(num) || num < 0 || num > 255) {
-            throw new Error('Invalid binary segment');
-          }
+          if (isNaN(num) || num < 0 || num > 255) throw new Error('Invalid binary');
           return num.toString();
         });
         outputField.value = decimalSegments.join('.');
-      } catch (err) {
+      } catch {
         outputField.value = 'Invalid input';
       }
     }
